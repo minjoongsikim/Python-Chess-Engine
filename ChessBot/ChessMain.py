@@ -1,6 +1,6 @@
 #main class, handles user input and displays game state
 import pygame
-from ChessBot import ChessEngine
+from ChessBot import ChessEngine, SmartMoveFinder
 pygame.init()
 
 WIDTH = HEIGHT = 512
@@ -39,7 +39,7 @@ def main():
     playerClicks = [] #keeps track of player clicks(two tuples, to track move)
     gameOver = False
     playerOne = True # if a human is playing white, then true, if AI is white, then false
-    playerTwo = False
+    playerTwo = False #can pit two AI against each o ther if both are false
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in pygame.event.get():
@@ -82,6 +82,17 @@ def main():
                     playerClicks = []
                     moveMade = False
                     animate = False
+
+        #AI move finder
+        if not gameOver and not humanTurn:
+            AIMove = SmartMoveFinder.findBestMove(gs, validMoves)
+            if AIMove is None:
+                AIMove = SmartMoveFinder.findRandomMove(validMoves)
+
+            gs.makeMove(AIMove)
+            moveMade = True
+            animate = True
+
 
         if moveMade:
             if animate:
@@ -149,7 +160,7 @@ def animateMove(move,screen,board,clock):
     coords = [] #list of coordinations for animation
     dR = move.endRow - move.startRow
     dC = move.endCol - move.startCol
-    framesPerSquare = 10 # frame speed
+    framesPerSquare = 2 # frame speed
     frameCount = (abs(dR) + abs(dC)) * framesPerSquare
     for frame in range(frameCount + 1):
         r,c = (move.startRow + dR*frame/frameCount, move.startCol + dC*frame/frameCount)

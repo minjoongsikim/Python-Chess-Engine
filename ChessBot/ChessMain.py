@@ -75,6 +75,7 @@ def main():
                     gs.undoMove()
                     moveMade = True
                     animate = False
+                    gameOver = False
                 if e.key == pygame.K_r: #reset when 'r' is pressed
                     gs = ChessEngine.currentState()
                     validMoves = gs.getValidMoves()
@@ -82,6 +83,7 @@ def main():
                     playerClicks = []
                     moveMade = False
                     animate = False
+                    gameOver = False
 
         #AI move finder
         if not gameOver and not humanTurn:

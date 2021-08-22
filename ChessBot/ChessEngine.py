@@ -61,7 +61,7 @@ class currentState():
                 self.board[move.endRow][move.endCol+1] = self.board[move.endRow][move.endCol -2]
                 self.board[move.endRow][move.endCol-2] = '--'
 
-        self.enPassantPossibleLog.append(self.en)
+        self.enPassantPossibleLog.append(self.enPassantPossible)
 
         #update castling rights - whenever it is a rook or a king move
         self.updateCastleRights(move)
@@ -354,7 +354,7 @@ class Move():
         #castle move
         self.isCastleMove = isCastleMove
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
-
+        self.isCapture = self.pieceCaptured != '--'
 
 
     #Override Equals method (fml)
@@ -368,3 +368,26 @@ class Move():
 
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]
+
+
+    #Overriding str() function
+
+    def __str__(self):
+        #castle move
+        if self.isCastleMove:
+            return "0-0" if self.endCol == 6 else "0-0-0"
+        endSquare = self.getRankFile(self.endRow, self.endCol)
+        if self.pieceMoved[1] == 'P':
+            if self.isCapture:
+                return self.colsToFiles[self.startCol] + "x" + endSquare
+            else:
+                return endSquare
+
+            #pawn promotions, and same type moving to square not completed
+
+            # add + for checkmoves and # for checkmate
+
+        moveString = self.pieceMoved[1]
+        if self.isCapture:
+            moveString += 'x'
+        return moveString + endSquare

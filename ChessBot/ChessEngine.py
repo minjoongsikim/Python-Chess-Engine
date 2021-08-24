@@ -203,6 +203,7 @@ class currentState():
 
     def getPawnMoves(self, r, c, moves):
         if self.whiteToMove:
+            kingRow, kingCol = self.whiteKingLocation
             if self.board[r-1][c] == "--": # 1 square move
                 moves.append(Move((r,c), (r-1,c), self.board))
                 if r ==6 and self.board[r-2][c] == '--': # initial first move 2 square
@@ -211,13 +212,52 @@ class currentState():
                 if self.board[r-1][c-1][0] == 'b':
                     moves.append(Move((r, c), (r - 1, c - 1), self.board))
                 elif (r-1,c-1) == self.enPassantPossible:
-                    moves.append(Move((r, c), (r - 1, c - 1), self.board, isEnpassantMove=True))
-            if c + 1 <=7:
+                    attackingPiece = blockingPiece = False
+                    if kingRow == r:
+                        if kingCol < c: #king is left of pawn
+                            #inside between king and pawn, outside range between pawn and board
+                            insideRange = range(kingCol + 1, c - 1)
+                            outsideRange = range(c+1,8)
+                        else :
+                            insideRange = range(kingCol - 1, c, -1)
+                            outsideRange = range(c - 2, -1, -1)
+                        for i in insideRange:
+                            if self.board[r][i] != "--": #non pawn piece blocks
+                                blockingPiece = True
+                        for i in outsideRange:
+                            square = self.board[r][i]
+                            if square[0] == 'b' and (square[1] == "R" or square[1] == "Q"):
+                                attackingPiece = True
+                            elif square != "--":
+                                blockingPiece = True
+                    if not attackingPiece or blockingPiece:
+                        moves.append(Move((r, c), (r - 1, c - 1), self.board, isEnpassantMove=True))
+            if c + 1 <= 7:
                 if self.board[r - 1][c + 1][0] == 'b':
                     moves.append(Move((r, c), (r - 1, c + 1), self.board))
                 elif (r-1,c+1) == self.enPassantPossible:
-                    moves.append(Move((r, c), (r - 1, c + 1), self.board, isEnpassantMove=True))
+                    attackingPiece = blockingPiece = False
+                    if kingRow == r:
+                        if kingCol < c:  # king is left of pawn
+                            # inside between king and pawn, outside range between pawn and board
+                            insideRange = range(kingCol + 1, c)
+                            outsideRange = range(c + 2, 8)
+                        else:
+                            insideRange = range(kingCol - 1, c + 1, -1)
+                            outsideRange = range(c - 1, -1, -1)
+                        for i in insideRange:
+                            if self.board[r][i] != "--":  # non pawn piece blocks
+                                blockingPiece = True
+                        for i in outsideRange:
+                            square = self.board[r][i]
+                            if square[0] == "w" and (square[1] == "R" or square[1] == "Q"):
+                                attackingPiece = True
+                            elif square != "--":
+                                blockingPiece = True
+                    if not attackingPiece or blockingPiece:
+                        moves.append(Move((r, c), (r - 1, c + 1), self.board, isEnpassantMove=True))
         else: #black pawn moves
+            kingRow, kingCol = self.blackKingLocation
             if self.board[r+1][c] == "--": # 1 square move
                 moves.append(Move((r,c), (r+1,c), self.board))
                 if r == 1 and self.board[r+2][c] == '--': # initial first move 2 square

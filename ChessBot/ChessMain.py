@@ -44,7 +44,7 @@ def main():
     playerClicks = [] #keeps track of player clicks(two tuples, to track move)
     gameOver = False
     playerOne = True # if a human is playing white, then true, if AI is white, then false
-    playerTwo = False #can pit two AI against each o ther if both are false
+    playerTwo = True #can pit two AI against each o ther if both are false
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in pygame.event.get():
